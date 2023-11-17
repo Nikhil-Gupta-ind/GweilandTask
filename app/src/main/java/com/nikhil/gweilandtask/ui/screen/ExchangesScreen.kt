@@ -3,6 +3,7 @@ package com.nikhil.gweilandtask.ui.screen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +16,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -53,7 +60,7 @@ fun Exchanges(exchangesViewModel: ExchangesViewModel = viewModel()) {
             .fillMaxSize()
             .padding(horizontal = 30.dp)
     ) {
-        val (screenTitle, notificationIcon, notificationBadge, settingsIcon, searchField, filterButton, pagerHeading, pagerHeading2, cryptoCard, topCurrenciesTitle, viewAllText, currencyList, progress) = createRefs()
+        val (screenTitle, notificationIcon, notificationBadge, settingsIcon, searchField, filterButton, filterOptions, pagerHeading, pagerHeading2, cryptoCard, topCurrenciesTitle, viewAllText, currencyList, progress) = createRefs()
 
         Text(
             text = "EXCHANGES",
@@ -98,24 +105,46 @@ fun Exchanges(exchangesViewModel: ExchangesViewModel = viewModel()) {
                     width = Dimension.fillToConstraints
                 }
         )
-        OutlinedButton(
-            onClick = { },
-            contentPadding = PaddingValues(16.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0x4D000000)),
+
+        var expanded by remember { mutableStateOf(false) }
+        Box(
             modifier = Modifier
                 .constrainAs(filterButton) {
                     top.linkTo(searchField.top)
                     end.linkTo(parent.end)
                 }
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_filter),
-                contentDescription = "Filter"
-            )
-            Spacer(modifier = Modifier.size(5.dp))
-            Text(text = "Filter")
+            OutlinedButton(
+                onClick = { expanded = true },
+                contentPadding = PaddingValues(16.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0x4D000000))
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_filter),
+                    contentDescription = "Filter"
+                )
+                Spacer(modifier = Modifier.size(5.dp))
+                Text(text = "Filter")
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(text = { Text("CMC Rank") }, onClick = {
+                    exchangesViewModel.updateSelectedOption("market_cap")
+                    expanded = false
+                })
+                DropdownMenuItem(text = { Text("Price") }, onClick = {
+                    exchangesViewModel.updateSelectedOption("price")
+                    expanded = false
+                })
+                DropdownMenuItem(text = { Text("Volume 24h") }, onClick = {
+                    exchangesViewModel.updateSelectedOption("volume_24h")
+                    expanded = false
+                })
+            }
         }
-        // todo horizontal pager
+        // require horizontal pager
         Text(
             text = "CryptoCurrency",
             fontSize = 20.sp,

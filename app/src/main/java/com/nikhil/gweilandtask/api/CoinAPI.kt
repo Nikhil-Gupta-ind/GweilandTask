@@ -11,10 +11,8 @@ import retrofit2.http.Query
 interface CoinAPI {
 
     @GET("v1/cryptocurrency/listings/latest")
-    @Headers("X-CMC_PRO_API_KEY: ${BuildConfig.COINS_KEY}")
-    suspend fun getCoins(): Response<CoinsResponse>
+    suspend fun getCoins(@Query("sort") sort: String): Response<CoinsResponse>
 
     @GET("v2/cryptocurrency/info")
-    @Headers("X-CMC_PRO_API_KEY: ${BuildConfig.COINS_KEY}")
     suspend fun getCurrencyInfo(@Query("id") id: String): Response<JsonObject>
 }

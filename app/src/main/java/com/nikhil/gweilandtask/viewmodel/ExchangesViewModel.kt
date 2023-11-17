@@ -1,5 +1,9 @@
 package com.nikhil.gweilandtask.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nikhil.gweilandtask.model.CoinsResponse
@@ -14,12 +18,18 @@ class ExchangesViewModel @Inject constructor(private val repository: CoinReposit
 
     val coins: StateFlow<List<CoinsResponse.Data>>
         get() = repository.coins
+    private var selectedOption by mutableStateOf("market_cap")
 
-    init {
+    fun updateSelectedOption(selected: String){
+        selectedOption = selected
         viewModelScope.launch {
-            repository.getTop20Coins()
+            repository.getTop20Coins(selectedOption)
         }
     }
 
-    // todo filter and search text
+    init {
+        viewModelScope.launch {
+            repository.getTop20Coins(selectedOption)
+        }
+    }
 }

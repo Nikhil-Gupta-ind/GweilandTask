@@ -127,7 +127,7 @@ fun BitcoinCard(
         Text(
             text = data.quote.USD.percent_change_24h.formatAsPercentage()/*"+2.5%"*/,
             fontSize = 13.sp,
-            color = Color(0xFF00CE08),
+            color = if (data.quote.USD.percent_change_24h > 0) Color(0xFF00CE08) else Color.Red,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .constrainAs(percentText) {

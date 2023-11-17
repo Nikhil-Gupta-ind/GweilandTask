@@ -14,8 +14,8 @@ class CoinRepository @Inject constructor(private val coinAPI: CoinAPI) {
     val coins: StateFlow<List<CoinsResponse.Data>>
         get() = _coins
 
-    suspend fun getTop20Coins() {
-        val response = coinAPI.getCoins()
+    suspend fun getTop20Coins(sort: String) {
+        val response = coinAPI.getCoins(sort)
         if (response.isSuccessful && response.body() != null) {
             Log.d("Response", "getCoins: ${response.body()}")
             val list = response.body()!!.data.take(20)
@@ -24,15 +24,7 @@ class CoinRepository @Inject constructor(private val coinAPI: CoinAPI) {
         }
     }
 
-    suspend fun getCurrencyInfo(vararg id: Int) {
-        val response = coinAPI.getCurrencyInfo(id.joinToString(separator = ","))
-        if (response.isSuccessful && response.body() != null) {
-            Log.d("Response", "getCoins: ${response.body()}")
-//            _coins.emit(response.body()!!.data)
-        }
-    }
-
-    suspend fun getLogos(list: List<CoinsResponse.Data>) {
+    private suspend fun getLogos(list: List<CoinsResponse.Data>) {
         val ids = mutableListOf<Int>()
         list.forEach {
             ids.add(it.id)
@@ -44,7 +36,15 @@ class CoinRepository @Inject constructor(private val coinAPI: CoinAPI) {
             var i = 0
             dataObject.keys().forEach { key ->
                 val itemObject = dataObject.getJSONObject(key)
-                list[i++].logoUrl = itemObject.getString("logo")
+//                if(list[i].id == itemObject.getInt("id")) {
+//                    list[i++].logoUrl = itemObject.getString("logo")
+//                }
+                list.forEach {
+                    if(it.id == itemObject.getInt("id")) {
+                        it.logoUrl = itemObject.getString("logo")
+                    }
+                }
+                i++
             }
 
             val newList = list.subList(0, list.size - 1) // for recomposition
